@@ -3,7 +3,7 @@ variable "csr_ami_id" {
   default = ""
 }
 
-variable "instance_size" {
+variable "csr_instance_size" {
   type    = string
   default = "t2.medium"
 }
