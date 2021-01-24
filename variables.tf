@@ -15,10 +15,10 @@ variable "default_tags" {
 
 variable "name_prefix" {
   type    = string
-  default = "csr-demo"
+  default = ""
 }
 
 variable "key_pair" {
   type = string
-  default = "hattont-desk-key-02"
+  default = ""
 }

@@ -1,9 +1,15 @@
 ## Shared
+locals {
+  csr_instance_tags = {
+    ansible_group = "routers"
+  }
+}
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.63.0"
 
-  name = "${var.name_prefix}-vpc"
+  name = "${var.name_prefix}vpc"
   cidr = "10.128.0.0/16"
 
   azs             = ["us-west-1a"]
@@ -16,6 +22,24 @@ module "vpc" {
   tags = {
     Terraform = "true"
     Lab_ID    = var.name_prefix
+  }
+}
+
+resource "random_password" "admin_password" {
+  length  = 16
+  special = false
+}
+
+resource "local_file" "foo" {
+  content  = random_password.admin_password.result
+  filename = "${path.module}/playbooks/credentials"
+}
+
+data "template_file" "user_data" {
+  template = file("${path.module}/templates/user_data.tpl")
+
+  vars = {
+    admin_password = random_password.admin_password.result
   }
 }
 
@@ -77,6 +101,7 @@ resource "aws_instance" "csr_1" {
   ami           = var.csr_ami_id == "" ? data.aws_ami.amazon_linux_image.id : var.csr_ami_id
   instance_type = var.csr_instance_size
   key_name      = var.key_pair != "" ? var.key_pair : null
+  user_data     = data.template_file.user_data.rendered
 
   network_interface {
     network_interface_id = aws_network_interface.csr_1_Ge1.id
@@ -88,7 +113,7 @@ resource "aws_instance" "csr_1" {
     device_index         = 1
   }
 
-  tags = merge(map("Name", "${var.name_prefix}csr1"), var.default_tags)
+  tags = merge(map("Name", "${var.name_prefix}csr1"), local.csr_instance_tags, var.default_tags)
 }
 
 resource "aws_network_interface" "csr_1_Ge1" {
@@ -122,6 +147,7 @@ resource "aws_instance" "csr_2" {
   ami           = var.csr_ami_id == "" ? data.aws_ami.amazon_linux_image.id : var.csr_ami_id
   instance_type = var.csr_instance_size
   key_name      = var.key_pair != "" ? var.key_pair : null
+  user_data     = data.template_file.user_data.rendered
 
   network_interface {
     network_interface_id = aws_network_interface.csr_2_Ge1.id
@@ -138,7 +164,7 @@ resource "aws_instance" "csr_2" {
     device_index         = 2
   }
 
-  tags = merge(map("Name", "${var.name_prefix}csr2"), var.default_tags)
+  tags = merge(map("Name", "${var.name_prefix}csr2"), local.csr_instance_tags, var.default_tags)
 }
 
 resource "aws_network_interface" "csr_2_Ge1" {
@@ -180,6 +206,7 @@ resource "aws_instance" "csr_3" {
   ami           = var.csr_ami_id == "" ? data.aws_ami.amazon_linux_image.id : var.csr_ami_id
   instance_type = var.csr_instance_size
   key_name      = var.key_pair != "" ? var.key_pair : null
+  user_data     = data.template_file.user_data.rendered
 
   network_interface {
     network_interface_id = aws_network_interface.csr_3_Ge1.id
@@ -191,7 +218,7 @@ resource "aws_instance" "csr_3" {
     device_index         = 1
   }
 
-  tags = merge(map("Name", "${var.name_prefix}csr3"), var.default_tags)
+  tags = merge(map("Name", "${var.name_prefix}csr3"), local.csr_instance_tags, var.default_tags)
 }
 
 resource "aws_network_interface" "csr_3_Ge1" {
