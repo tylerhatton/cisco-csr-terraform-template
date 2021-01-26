@@ -3,6 +3,8 @@ A simple Terraform template that sets up a set of inteconnected Cisco CSRs to qu
 
 ## Architecture Diagram
 
+![Diagram1](images/image1.png)
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
