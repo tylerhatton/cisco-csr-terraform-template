@@ -19,6 +19,6 @@ variable "name_prefix" {
 }
 
 variable "key_pair" {
-  type = string
+  type    = string
   default = ""
 }
