@@ -1,0 +1,13 @@
+---
+ansible_user: admin
+ansible_password: "{{ lookup('file', playbook_dir + '/credentials') }}"
+ansible_become_password: "{{ lookup('file', playbook_dir + '/credentials') }}"
+ansible_network_os: ios
+ansible_connection: network_cli
+ansible_become_method: enable
+
+login_banner: "UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED"
+dns_servers:
+  - 8.8.8.8
+ntp_servers:
+  - time.google.com

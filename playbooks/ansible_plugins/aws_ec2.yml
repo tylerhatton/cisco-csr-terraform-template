@@ -10,3 +10,5 @@ filters:
   tag:ansible_group: routers
 hostnames:
   - tag:Name
+compose:
+  ansible_host: public_ip_address

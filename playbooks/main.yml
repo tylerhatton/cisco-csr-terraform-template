@@ -1,1 +1,45 @@
 ---
+- name: backup router configurations
+  hosts: tag_ansible_group_routers
+  connection: network_cli
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Configure Hostname and DNS
+      ios_system:
+        hostname: "{{ inventory_hostname_short }}"
+        name_servers: "{{ dns_servers }}"
+      notify: "save ios"
+
+    - name: Set Login Banner
+      ios_banner:
+        banner: login
+        text: "{{ login_banner }}"
+      notify: "save ios"
+
+    - name: Configure NTP
+      ios_ntp:
+        server: "{{ item }}"
+      loop: "{{ ntp_servers }}"
+      notify: "save ios"
+
+    - name: Configuration Interfaces
+      ios_config:
+        parents: "{{ item.parent }}"
+        lines: "{{ item.lines | default(omit) }}"
+        after: "{{ item.after | default(omit) }}"
+      loop: "{{ interfaces }}"
+      notify: "save ios"
+
+    - name: Enable OSPF
+      ios_config:
+        parents: "{{ item.parent }}"
+        lines: "{{ item.lines | default(omit) }}"
+        after: "{{ item.after | default(omit) }}"
+      loop: "{{ ospf }}"
+      notify: "save ios"
+  handlers:
+  - name: save ios
+    ios_command:
+      commands: "write mem"
+    when: not ansible_check_mode

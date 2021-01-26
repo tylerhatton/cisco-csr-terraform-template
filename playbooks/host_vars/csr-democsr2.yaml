@@ -1,0 +1,33 @@
+---
+interfaces:
+  - parent: interface GigabitEthernet2
+    lines:
+      - ip address 10.128.10.11 255.255.255.0
+    after:
+      - no shutdown
+  - parent: interface GigabitEthernet3
+    lines:
+      - ip address 10.128.20.11 255.255.255.0
+    after:
+      - no shutdown
+  - parent: interface Tunnel0
+    lines:
+      - ip address 172.16.0.2 255.255.255.252
+      - ip mtu 1400
+      - ip tcp adjust-mss 1360
+      - tunnel source 10.128.10.11
+      - tunnel destination 10.128.10.10
+  - parent: interface Tunnel1
+    lines:
+      - ip address 172.16.0.5 255.255.255.252
+      - ip mtu 1400
+      - ip tcp adjust-mss 1360
+      - tunnel source 10.128.20.11
+      - tunnel destination 10.128.20.12
+ospf:
+  - parent: router ospf 1
+    lines:
+      - network 10.128.10.0 0.0.0.255 area 0
+      - network 10.128.20.0 0.0.0.255 area 0
+      - network 172.16.0.0 0.0.0.3 area 0
+      - network 172.16.0.4 0.0.0.3 area 0
